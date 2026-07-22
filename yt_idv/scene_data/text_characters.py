@@ -3,7 +3,7 @@ from collections import namedtuple
 
 import numpy as np
 import traitlets
-from matplotlib.ft2font import LOAD_FORCE_AUTOHINT
+from matplotlib.ft2font import LoadFlags
 from OpenGL import GL
 
 from yt_idv.opengl_support import Texture2D, VertexArray, VertexAttribute
@@ -28,12 +28,12 @@ class TextCharacters(SceneData):
     def build_textures(self):
         # This doesn't check if the textures have already been built
         self.font.set_size(self.font_size, 200)
-        chars = [ord(_) for _ in string.printable]
+        chars = [ord(c) for c in string.printable if c.isprintable()]
         tex_ids = GL.glGenTextures(len(chars))
         vert = []
         for i, (tex_id, char_code) in enumerate(zip(tex_ids, chars)):
             self.font.clear()
-            self.font.set_text(chr(char_code), flags=LOAD_FORCE_AUTOHINT)
+            self.font.set_text(chr(char_code), flags=LoadFlags.FORCE_AUTOHINT)
             self.font.draw_glyphs_to_bitmap(antialiased=True)
             glyph = self.font.load_char(char_code)
             x0, y0, x1, y1 = glyph.bbox
